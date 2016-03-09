@@ -123,8 +123,15 @@ function getWebpackFileManager(less, loaderContext, query, isSync) {
 			}
 
 			loaderContext.dependency && loaderContext.dependency(filename);
+
+			var importSpec = "-!" + __dirname + "/stringify.loader.js!";
+			if (query.importLoader) {
+				importSpec += query.importLoader + "!";
+			}
+			importSpec += filename;
+
 			// The default (asynchronous)
-			loaderContext.loadModule("-!" + __dirname + "/stringify.loader.js!" + filename, function(err, data) {
+			loaderContext.loadModule(importSpec, function(err, data) {
 				if(err) {
 					callback(err);
 					return;
@@ -139,6 +146,10 @@ function getWebpackFileManager(less, loaderContext, query, isSync) {
 	};
 
 	WebpackFileManager.prototype.loadFileSync = function(filename, currentDirectory, options, environment) {
+		if (query.importLoader) {
+			loaderContext.emitWarning("Option 'importLoader' is not supported in synchronous mode.");
+		}
+
 		var moduleRequest = loaderUtils.urlToRequest(filename, query.root);
 		// Less is giving us trailing slashes, but the context should have no trailing slash
 		var context = currentDirectory.replace(trailingSlash, "");
