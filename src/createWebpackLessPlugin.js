@@ -44,10 +44,14 @@ function createWebpackLessPlugin(loaderContext) {
           resolvedFilename = f;
           loaderContext.addDependency(resolvedFilename);
 
-          if (isLessCompatible.test(resolvedFilename)) {
-            return readFile(resolvedFilename)
-              .then(contents => contents.toString('utf8'));
-          }
+          /**
+           * Allways use all the loaders
+           * https://github.com/webpack-contrib/less-loader/issues/213
+           */
+          //if (isLessCompatible.test(resolvedFilename)) {
+          //  return readFile(resolvedFilename)
+          //    .then(contents => contents.toString('utf8'));
+          //}
 
           return loadModule([stringifyLoader, resolvedFilename].join('!'))
             .then(JSON.parse);
